@@ -1,30 +1,31 @@
 import { Pressable, StyleSheet, Text, View } from "react-native";
 import React from "react";
 
-const Dropdown = ({ setAccountType, setIsDropdownOpen }) => {
+const Dropdown = ({
+  accountType,
+  setAccountType,
+  setIsDropdownOpen,
+  clearErrors,
+}) => {
+  const onPress = (type) => {
+    if (accountType === type) {
+      setIsDropdownOpen(false);
+      return;
+    }
+    setAccountType(type);
+    setIsDropdownOpen(false);
+    clearErrors();
+  };
+
   return (
     <View style={styles.dropdownContainer}>
       <Pressable
         style={styles.dropdownItem}
-        onPress={() => {
-          setAccountType("Advanced");
-          setIsDropdownOpen(false);
-        }}
+        onPress={() => onPress("Advanced")}
       >
         <Text style={styles.dropdownItemLabel}>Advanced</Text>
       </Pressable>
-      <Pressable
-        style={{
-          zIndex: 2,
-          width: "100%",
-          paddingHorizontal: 10,
-          paddingVertical: 5,
-        }}
-        onPress={() => {
-          setAccountType("Manual");
-          setIsDropdownOpen(false);
-        }}
-      >
+      <Pressable style={styles.dropdownItem} onPress={() => onPress("Manual")}>
         <Text style={styles.dropdownItemLabel}>Manual</Text>
       </Pressable>
     </View>
