@@ -1,23 +1,27 @@
 import { useState } from "react";
 import {
   Alert,
+  Keyboard,
   Pressable,
   StyleSheet,
   Text,
   TextInput,
   TouchableOpacity,
+  TouchableWithoutFeedback,
   View,
 } from "react-native";
 import Checkbox from "expo-checkbox";
 import { Ionicons } from "@expo/vector-icons";
 
-import { validateUserName } from "./util/util";
+import { isValidUrl, validateUserName } from "./util/util";
 import Dropdown from "./components/Dropdown";
 
 const Colors = {
   error: "#ff0000",
   success: "green",
   gray: "#ccc",
+  white: "#fff",
+  dark: "#000",
 };
 
 export default function App() {
@@ -94,7 +98,6 @@ export default function App() {
     setServerPath("");
     setPort("");
     setIsChecked(false);
-    setAccountType("Advanced");
     clearErrors();
   };
 
@@ -117,7 +120,7 @@ export default function App() {
     if (serverAddress.trim() === "") {
       setServerAddressError("Server address is required");
       checkErrors = true;
-    } else if (!serverAddress.includes(".")) {
+    } else if (!isValidUrl(serverAddress)) {
       setServerAddressError("Invalid server address");
       checkErrors = true;
     }
@@ -143,188 +146,200 @@ export default function App() {
   };
 
   return (
-    <View style={styles.container}>
-      <View style={styles.inputContainer}>
-        <Text style={styles.inputLabel}>Account Type:</Text>
-        <TextInput
-          style={styles.textInput}
-          editable={false}
-          value={accountType}
-          onPressIn={() => setIsDropdownOpen(!isDropdownOpen)}
-        />
-        <Pressable
-          style={{
-            position: "absolute",
-            backgroundColor: Colors.error,
-            right: 5,
-            borderRadius: 8,
-          }}
-          onPress={() => setIsDropdownOpen(!isDropdownOpen)}
-        >
-          <Ionicons name="chevron-expand" size={22} color="white" />
-        </Pressable>
-        {isDropdownOpen && (
-          <Dropdown
-            accountType={accountType}
-            setAccountType={setAccountType}
-            setIsDropdownOpen={setIsDropdownOpen}
-            clearErrors={clearErrors}
-          />
-        )}
-      </View>
-
-      <View
-        style={{
-          alignItems: "center",
-          zIndex: -10,
-        }}
-      >
+    <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
+      <View style={styles.container}>
         <View style={styles.inputContainer}>
-          <Text style={styles.inputLabel}>User Name:</Text>
+          <Text style={styles.inputLabel}>Account Type:</Text>
           <TextInput
-            style={{
-              ...styles.textInput,
-              borderWidth: userNameError ? 3 : 1,
-              borderColor: userNameError ? Colors.error : Colors.gray,
-            }}
-            placeholder="name@example.com"
-            value={userName}
-            onChangeText={setUserName}
-            autoCorrect={false}
-            keyboardType="email-address"
-            autoCapitalize="none"
+            style={styles.textInput}
+            editable={false}
+            value={accountType}
+            onPressIn={() => setIsDropdownOpen(!isDropdownOpen)}
           />
-        </View>
-        {userNameError && <Text style={styles.error}>{userNameError}</Text>}
-        <View style={styles.inputContainer}>
-          <Text style={styles.inputLabel}>Password: </Text>
-          <TextInput
+          <Pressable
             style={{
-              ...styles.textInput,
-              borderWidth: passwordError ? 3 : 1,
-              borderColor: passwordError ? Colors.error : Colors.gray,
+              position: "absolute",
+              backgroundColor: Colors.error,
+              right: 5,
+              borderRadius: 8,
             }}
-            placeholder="Required"
-            value={password}
-            onChangeText={setPassword}
-            secureTextEntry
-          />
-        </View>
-        {passwordError && (
-          <Text
-            style={{
-              ...styles.error,
-              left: 60,
-            }}
+            onPress={() => setIsDropdownOpen(!isDropdownOpen)}
           >
-            {passwordError}
-          </Text>
-        )}
-      </View>
-      <View style={styles.inputContainer}>
-        <Text style={styles.inputLabel}>Server Address: </Text>
-        <TextInput
+            <Ionicons name="chevron-expand" size={22} color={Colors.white} />
+          </Pressable>
+          {isDropdownOpen && (
+            <Dropdown
+              accountType={accountType}
+              setAccountType={setAccountType}
+              setIsDropdownOpen={setIsDropdownOpen}
+              clearErrors={clearErrors}
+            />
+          )}
+        </View>
+
+        <View
           style={{
-            ...styles.textInput,
-            borderWidth: serverAddressError ? 3 : 1,
-            borderColor: serverAddressError ? Colors.error : Colors.gray,
-          }}
-          autoCapitalize="none"
-          placeholder="example.com"
-          value={serverAddress}
-          onChangeText={setServerAddress}
-        />
-      </View>
-      {serverAddressError && (
-        <Text
-          style={{
-            ...styles.error,
-            left: 0,
+            alignItems: "center",
+            zIndex: -10,
           }}
         >
-          {serverAddressError}
-        </Text>
-      )}
-      {accountType === "Advanced" && (
-        <>
           <View style={styles.inputContainer}>
-            <Text style={styles.inputLabel}>Server Path: </Text>
+            <Text style={styles.inputLabel}>User Name:</Text>
             <TextInput
               style={{
                 ...styles.textInput,
-                borderWidth: serverPathError ? 3 : 1,
-                borderColor: serverPathError ? Colors.error : Colors.gray,
+                borderWidth: userNameError ? 3 : 1,
+                borderColor: userNameError ? Colors.error : Colors.gray,
               }}
-              placeholder="/calendars/user/"
-              value={serverPath}
-              onChangeText={setServerPath}
+              placeholder="name@example.com"
+              value={userName}
+              onChangeText={setUserName}
+              autoCorrect={false}
+              keyboardType="email-address"
               autoCapitalize="none"
             />
           </View>
-          {serverPathError && (
+          {userNameError && <Text style={styles.error}>{userNameError}</Text>}
+          <View style={styles.inputContainer}>
+            <Text style={styles.inputLabel}>Password: </Text>
+            <TextInput
+              style={{
+                ...styles.textInput,
+                borderWidth: passwordError ? 3 : 1,
+                borderColor: passwordError ? Colors.error : Colors.gray,
+              }}
+              placeholder="Required"
+              value={password}
+              onChangeText={setPassword}
+              secureTextEntry
+            />
+          </View>
+          {passwordError && (
             <Text
               style={{
                 ...styles.error,
-                left: -10,
+                left: 60,
               }}
             >
-              {serverPathError}
+              {passwordError}
             </Text>
           )}
-          <View
+        </View>
+        <View style={styles.inputContainer}>
+          <Text style={styles.inputLabel}>Server Address: </Text>
+          <TextInput
             style={{
-              ...styles.inputContainer,
-              justifyContent: "flex-start",
+              ...styles.textInput,
+              borderWidth: serverAddressError ? 3 : 1,
+              borderColor: serverAddressError ? Colors.error : Colors.gray,
+            }}
+            autoCapitalize="none"
+            placeholder="example.com"
+            value={serverAddress}
+            onChangeText={setServerAddress}
+          />
+        </View>
+        {serverAddressError && (
+          <Text
+            style={{
+              ...styles.error,
+              left: 0,
             }}
           >
-            <Text style={styles.inputLabel}>Port: </Text>
-            <View style={styles.checkboxContainer}>
+            {serverAddressError}
+          </Text>
+        )}
+        {accountType === "Advanced" && (
+          <>
+            <View style={styles.inputContainer}>
+              <Text style={styles.inputLabel}>Server Path: </Text>
               <TextInput
                 style={{
                   ...styles.textInput,
-                  width: 100,
-                  borderWidth: portError ? 3 : 1,
-                  borderColor: portError ? Colors.error : Colors.gray,
+                  borderWidth: serverPathError ? 3 : 1,
+                  borderColor: serverPathError ? Colors.error : Colors.gray,
                 }}
-                value={port}
-                onChangeText={setPort}
-                keyboardType="numeric"
+                placeholder="/calendars/user/"
+                value={serverPath}
+                onChangeText={setServerPath}
+                autoCapitalize="none"
               />
-              <Checkbox
-                value={isChecked}
-                onValueChange={setIsChecked}
-                color={!isChecked ? "#000" : Colors.error}
-                style={{
-                  marginLeft: 30,
-                }}
-              />
-
-              <Text style={{ marginLeft: 10 }}>Use SSL</Text>
             </View>
-          </View>
-          {portError && (
-            <Text
+            {serverPathError && (
+              <Text
+                style={{
+                  ...styles.error,
+                  left: -10,
+                }}
+              >
+                {serverPathError}
+              </Text>
+            )}
+            <View
               style={{
-                ...styles.error,
-                left: 50,
+                ...styles.inputContainer,
+                justifyContent: "flex-start",
               }}
             >
-              {portError}
-            </Text>
-          )}
-        </>
-      )}
-      <TouchableOpacity
-        style={{
-          ...styles.button,
-          backgroundColor: isButtonDisabled() ? "gray" : Colors.success,
-        }}
-        disabled={isButtonDisabled()}
-        onPress={handleSubmit}
-      >
-        <Text style={styles.buttonLabel}>Submit</Text>
-      </TouchableOpacity>
-    </View>
+              <Text style={styles.inputLabel}>Port: </Text>
+              <View style={styles.checkboxContainer}>
+                <TextInput
+                  style={{
+                    ...styles.textInput,
+                    width: 100,
+                    borderWidth: portError ? 3 : 1,
+                    borderColor: portError ? Colors.error : Colors.gray,
+                  }}
+                  value={port}
+                  onChangeText={(val) => {
+                    if (val.length > 4) {
+                      Keyboard.dismiss();
+                      return;
+                    }
+                    setPort(val);
+                    if (val.length === 4) {
+                      Keyboard.dismiss();
+                      return;
+                    }
+                  }}
+                  keyboardType="numeric"
+                />
+                <Checkbox
+                  value={isChecked}
+                  onValueChange={setIsChecked}
+                  color={!isChecked ? Colors.dark : Colors.error}
+                  style={{
+                    marginLeft: 30,
+                  }}
+                />
+
+                <Text style={{ marginLeft: 10 }}>Use SSL</Text>
+              </View>
+            </View>
+            {portError && (
+              <Text
+                style={{
+                  ...styles.error,
+                  left: 50,
+                }}
+              >
+                {portError}
+              </Text>
+            )}
+          </>
+        )}
+        <TouchableOpacity
+          style={{
+            ...styles.button,
+            backgroundColor: isButtonDisabled() ? Colors.gray : Colors.success,
+          }}
+          disabled={isButtonDisabled()}
+          onPress={handleSubmit}
+        >
+          <Text style={styles.buttonLabel}>Submit</Text>
+        </TouchableOpacity>
+      </View>
+    </TouchableWithoutFeedback>
   );
 }
 
@@ -339,12 +354,12 @@ const styles = StyleSheet.create({
   },
   buttonLabel: {
     fontSize: 16,
-    color: "#fff",
+    color: Colors.white,
     fontWeight: "bold",
   },
   container: {
     flex: 1,
-    backgroundColor: "#fff",
+    backgroundColor: Colors.white,
     alignItems: "center",
     justifyContent: "center",
     paddingHorizontal: 30,
@@ -377,7 +392,7 @@ const styles = StyleSheet.create({
   },
   textInput: {
     width: "70%",
-    backgroundColor: "#fff",
+    backgroundColor: Colors.white,
     marginLeft: 5,
     paddingVertical: 5,
     paddingHorizontal: 10,

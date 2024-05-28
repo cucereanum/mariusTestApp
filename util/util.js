@@ -4,3 +4,15 @@ export const validateUserName = (email) => {
   );
   return emailPattern.test(email);
 };
+
+export const isValidUrl = (string) => {
+  const urlPattern = new RegExp(
+    "((([a-z\\d]([a-z\\d-]*[a-z\\d])*)\\.)+[a-z]{2,}|" +
+      "((\\d{1,3}\\.){3}\\d{1,3}))" +
+      "(\\:\\d+)?(\\/[-a-z\\d%_.~+]*)*" +
+      "(\\?[;&a-z\\d%_.~+=-]*)?" +
+      "(\\#[-a-z\\d_]*)?$",
+    "i"
+  );
+  return urlPattern.test(string);
+};
