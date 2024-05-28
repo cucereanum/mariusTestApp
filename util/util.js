@@ -1,17 +1,6 @@
-export const validateUserName = (userName) => {
-  if (userName === "") {
-    return false;
-  }
-  const checkNumbers = userName.match(/\d+/g);
-  if (checkNumbers) {
-    return false;
-  }
-
-  return true;
-};
-
-export const validatePassword = (password) => {
-  if (password === "") {
-    return false;
-  }
+export const validateUserName = (email) => {
+  const emailPattern = new RegExp(
+    /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/
+  );
+  return emailPattern.test(email);
 };

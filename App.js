@@ -38,61 +38,33 @@ export default function App() {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
   const handleSubmit = () => {
-    let checkErrors = false;
-    setUserNameError(false);
-    setPasswordError(false);
-    setServerAddressError(false);
-    setServerPathError(false);
-    setPortError(false);
-
-    if (userName === "") {
-      setUserNameError("User name is required");
-      checkErrors = true;
-    } else if (!validateUserName(userName)) {
-      setUserNameError("Invalid user name");
-      checkErrors = true;
-    }
-    if (password === "") {
-      setPasswordError("Password is required");
-      checkErrors = true;
-    } else if (password.length < 8) {
-      setPasswordError("Password must be at least 8 characters long");
-      checkErrors = true;
-    }
-    if (serverAddress === "") {
-      setServerAddressError("Server address is required");
-      checkErrors = true;
-    } else if (!serverAddress.includes(".")) {
-      setServerAddressError("Invalid server address");
-      checkErrors = true;
-    }
-    if (accountType === "Advanced") {
-      if (serverPath === "") {
-        setServerPathError("Server path is required");
-        checkErrors = true;
-      } else if (!serverPath.startsWith("/")) {
-        setServerPathError("Invalid server path");
-        checkErrors = true;
-      }
-      if (port === "") {
-        setPortError("Port is required");
-        checkErrors = true;
-      } else if (isNaN(port) || port.length > 5) {
-        setPortError("Invalid port");
-        checkErrors = true;
-      } else if (port.length !== 4) {
-        setPortError("Port must be 4 digits long");
-        checkErrors = true;
-      }
-    }
+    clearErrors();
+    let checkErrors = checkInputsValidation();
 
     if (checkErrors) {
       return;
     }
 
-    const successMessage = `User Name: ${userName} \nPassword: ${password} \nServer Address: ${serverAddress} \nAccount Type: ${accountType} \nServer Path: ${serverPath} \nPort: ${port} \nUse SSL: ${isChecked}`;
+    const successManualMessage = `User Name: ${userName} \n
+    Password: ${password} \n
+    Server Address: ${serverAddress} 
+    \nAccount Type: ${accountType}`;
 
-    Alert.alert("Success", successMessage);
+    const successAdvancedMessage = `User Name: ${userName} \n
+    Password: ${password} \n
+    Server Address: ${serverAddress} 
+    \nAccount Type: ${accountType} \n
+    Server Path: ${serverPath} \n
+    Port: ${port} \n
+    Use SSL: ${isChecked}`;
+
+    const displayMessage =
+      accountType === "Advanced"
+        ? successAdvancedMessage
+        : successManualMessage;
+
+    Alert.alert("Success", displayMessage);
+    clearAllFields();
   };
 
   const checkDefaultMandatoryFields =
@@ -113,6 +85,61 @@ export default function App() {
     setServerAddressError(false);
     setServerPathError(false);
     setPortError(false);
+  };
+
+  const clearAllFields = () => {
+    setUserName("");
+    setPassword("");
+    setServerAddress("");
+    setServerPath("");
+    setPort("");
+    setIsChecked(false);
+    setAccountType("Advanced");
+    clearErrors();
+  };
+
+  const checkInputsValidation = () => {
+    let checkErrors = false;
+    if (userName.trim() === "") {
+      setUserNameError("User name is required");
+      checkErrors = true;
+    } else if (!validateUserName(userName)) {
+      setUserNameError("Invalid user name");
+      checkErrors = true;
+    }
+    if (password.trim() === "") {
+      setPasswordError("Password is required");
+      checkErrors = true;
+    } else if (password.trim().length < 8) {
+      setPasswordError("Password must be at least 8 characters long");
+      checkErrors = true;
+    }
+    if (serverAddress.trim() === "") {
+      setServerAddressError("Server address is required");
+      checkErrors = true;
+    } else if (!serverAddress.includes(".")) {
+      setServerAddressError("Invalid server address");
+      checkErrors = true;
+    }
+    if (accountType === "Advanced") {
+      if (serverPath.trim() === "") {
+        setServerPathError("Server path is required");
+        checkErrors = true;
+      }
+      if (!serverPath.startsWith("/")) {
+        setServerPathError("Invalid server path");
+        checkErrors = true;
+      }
+      if (port.trim() === "") {
+        setPortError("Port is required");
+        checkErrors = true;
+      } else if (isNaN(port) || port.length !== 4) {
+        setPortError("Port must be a number with 4 digits long");
+        checkErrors = true;
+      }
+    }
+
+    return checkErrors;
   };
 
   return (
@@ -164,6 +191,8 @@ export default function App() {
             value={userName}
             onChangeText={setUserName}
             autoCorrect={false}
+            keyboardType="email-address"
+            autoCapitalize="none"
           />
         </View>
         {userNameError && <Text style={styles.error}>{userNameError}</Text>}
@@ -200,6 +229,7 @@ export default function App() {
             borderWidth: serverAddressError ? 3 : 1,
             borderColor: serverAddressError ? Colors.error : Colors.gray,
           }}
+          autoCapitalize="none"
           placeholder="example.com"
           value={serverAddress}
           onChangeText={setServerAddress}
@@ -276,7 +306,7 @@ export default function App() {
             <Text
               style={{
                 ...styles.error,
-                left: 10,
+                left: 50,
               }}
             >
               {portError}
@@ -327,7 +357,7 @@ const styles = StyleSheet.create({
   },
   error: {
     color: Colors.error,
-    marginBottom: 5,
+    marginBottom: 10,
     left: -10,
     fontStyle: "italic",
     fontSize: 12,
@@ -341,6 +371,7 @@ const styles = StyleSheet.create({
   inputLabel: {
     textAlign: "right",
     width: "30%",
+    fontWeight: "bold",
     marginRight: 10,
     zIndex: -1,
   },
